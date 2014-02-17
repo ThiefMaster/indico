@@ -1,0 +1,104 @@
+.week-timetable-wrapper {
+    width: 99%;
+    margin: 0 auto;
+    padding-top: 1em;
+}
+
+.week-timetable {
+    font-family: helvetica,verdana,sans-serif;
+    font-size: 8pt;
+    line-height: 16px;
+}
+
+.week-timetable + .week-timetable {
+    margin-top: 1em;
+}
+
+.week-timetable > ul {
+    width: 100%;
+    padding: 0;
+    list-style: none;
+    box-sizing: border-box;
+}
+
+.week-timetable > ul > li {
+    float: left;
+    width: 14.28%;
+    display: inline-block;
+    margin: 0;
+    border: 2px #fff solid;
+    background: #808080;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+}
+
+.week-timetable.no-weekends > ul > li {
+    width: 20%;
+}
+
+.week-timetable .row {
+    height: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    position: relative;
+}
+
+.week-timetable .row .title {
+    font-weight: bold;
+}
+
+.week-timetable .row.placeholder + .row,
+.week-timetable .row:not(.placeholder):first-child {
+
+}
+
+.week-timetable .row.day-header {
+    background: #006;
+    color: #fff;
+    text-align: center;
+    font-weight: bold;
+}
+
+.week-timetable .row.placeholder {
+
+}
+
+.week-timetable .row.break {
+    background-color: #fcc;
+}
+
+.week-timetable .row.contrib {
+    background-color: #90c0f0;
+}
+
+.week-timetable .row .time {
+    position: absolute;
+    background: #ddd;
+    color: #000;
+    width: 35px;
+    height: 100%;
+    display: inline-block;
+    text-align: center;
+}
+
+.week-timetable .row .time + span {
+    position: absolute;
+    padding-left: 40px;
+    width: 100%;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+.week-timetable .row.contrib .time {
+    background: #b0e0ff;
+}
+
+.week-timetable .row .more-contribs {
+    position: absolute;
+    right: 0;
+    display: inline-block;
+    margin: 1px 4px 0 0;
+}
