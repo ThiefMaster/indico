@@ -1,3 +1,22 @@
+.event-info-header {
+    color: white;
+    text-align: left;
+    border-top: 3px solid #234173;
+    border-bottom: 1px solid #0f4c80;
+    background: #1a64a0;
+}
+
+.event-info-header > div {
+    padding: 1em 3em;
+}
+
+.event-title {
+    font-family: Roboto, 'Helvetica Neue', Helvetica, Verdana, Arial, sans-serif;
+    font-size: 22pt;
+    display: block;
+    color: white;
+}
+
 .week-timetable-wrapper {
     width: 99%;
     margin: 0 auto;
@@ -23,14 +42,20 @@
 
 .week-timetable > ul > li {
     float: left;
-    width: 14.28%;
+    width: 13.95%;
     display: inline-block;
-    margin: 0;
-    border: 2px #fff solid;
-    background: #808080;
+    margin: 2px;
+    border: 1px #bbb solid;
+    background: #fff;
     box-sizing: border-box;
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    -webkit-border-radius: 0.2em;
+    box-shadow: 1px 1px 1px #e1e1e1;
+    -moz-box-shadow: 1px 1px 1px #e1e1e1;
+    -webkit-box-shadow: 1px 1px 1px #e1e1e1;
 }
 
 .week-timetable.no-weekends > ul > li {
@@ -55,14 +80,23 @@
 }
 
 .week-timetable .row.day-header {
-    background: #006;
-    color: #fff;
+    background: #f9f9f9;
+    color: #1756B5;
     text-align: center;
     font-weight: bold;
+    border-bottom: 1px solid #bbb;
 }
 
 .week-timetable .row.placeholder {
+    border-bottom: 1px dashed #ddd;
+}
 
+.week-timetable .row.placeholder:last-child {
+    border-bottom: none;
+}
+
+.week-timetable .row.placeholder:last-child {
+    border-bottom: none;
 }
 
 .week-timetable .row.break {
@@ -70,7 +104,12 @@
 }
 
 .week-timetable .row.contrib {
-    background-color: #90c0f0;
+    background-color: #EDF3FD;
+    border-bottom: solid 1px #f9f9f9;
+}
+
+.week-timetable .row.contrib:last-child {
+    border-bottom: none;
 }
 
 .week-timetable .row .time {
@@ -93,12 +132,28 @@
 }
 
 .week-timetable .row.contrib .time {
-    background: #b0e0ff;
+    background: #5D95EA;
+    color: white;
+    font-weight: bold;
+}
+
+.week-timetable .row.contrib.js-same-time .time {
+    background: white;
 }
 
 .week-timetable .row .more-contribs {
+    color: #999;
     position: absolute;
     right: 0;
     display: inline-block;
     margin: 1px 4px 0 0;
+}
+
+.week-timetable .row .session-mark {
+    font-size: 1.5em;
+    position: absolute;
+    right: 0;
+    display: inline-block;
+    margin: 1px 4px 0 0;
+    text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
 }
