@@ -76,11 +76,14 @@
     weekTable, hasWeekends = buildTable()
 %>
 
-<div class="week-timetable-wrapper">
-    <div class="event-info">
-        <strong>${conf.getTitle()}</strong> ${common.renderEventTimeCompact(startDate, endDate)}
+<div class="event-info-header">
+    <div>
+        <div class="event-title">${conf.getTitle()}</div>
+        ${common.renderEventTimeCompact(startDate, endDate)}
     </div>
+</div>
 
+<div class="week-timetable-wrapper">
     % for week in weekTable:
         <div class="clearfix week-timetable ${'no-weekends' if not hasWeekends else ''}">
             <ul>
@@ -95,7 +98,8 @@
                                     <%
                                         extraStyle = 'display: none; ' if i > 0 else ''
                                         if entryType == 'contrib' and entry.getSession():
-                                            extraStyle = 'color: {0}; background-color: {1};'.format(entry.getSession().getTextColor(), entry.getSession().getColor())
+                                            sessionName = entry.getSession().getTitle()
+                                            sessionColor = entry.getSession().getColor()
                                     %>
                                     <div class="row ${entryType} ${'js-same-time' if i > 0 else ''}" style="${extraStyle}" data-slot="${startTime}">
                                         <span class="time">${startTime if i == 0 else ''}</span>
@@ -107,6 +111,9 @@
                                                 % endif
                                             % endif
                                         </span>
+                                        % if entryType == 'contrib' and entry.getSession():
+                                            <i class="icon-circle-small session-mark" title="Session: ${sessionName}" style="color: ${sessionColor}"></i>
+                                        % endif
                                         % if len(slotEntries) > 1 and i == 0:
                                             <i class="icon-info more-contribs" title="There are ${len(slotEntries)-1} more contributions at this time. Click this icon to show them."></i>
                                         % endif
