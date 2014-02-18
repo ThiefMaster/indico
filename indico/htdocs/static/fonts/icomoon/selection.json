@@ -1934,10 +1934,10 @@
 					"M651.131 344.402c26.747 0 50.135 14.254 63.181 35.512l51.159-31.283c-23.572-38.492-65.905-64.246-114.34-64.246v60.017z",
 					"M88.33 761.405h847.35v59.976h-847.35v-59.976z"
 				],
-				"grid": 16,
 				"tags": [
 					"projector"
-				]
+				],
+				"grid": 16
 			},
 			"properties": {
 				"order": 79,
@@ -1947,8 +1947,8 @@
 				"name": "projector",
 				"ligatures": ""
 			},
-			"setIdx": 1,
-			"iconIdx": 1
+			"setIdx": 0,
+			"iconIdx": 78
 		},
 		{
 			"icon": {
@@ -1971,7 +1971,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 78
+			"iconIdx": 79
 		},
 		{
 			"icon": {
@@ -1995,7 +1995,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 79
+			"iconIdx": 80
 		},
 		{
 			"icon": {
@@ -2019,7 +2019,7 @@
 				"code": 40
 			},
 			"setIdx": 0,
-			"iconIdx": 80
+			"iconIdx": 81
 		},
 		{
 			"icon": {
@@ -2042,7 +2042,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 81
+			"iconIdx": 82
 		},
 		{
 			"icon": {
@@ -2065,7 +2065,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 82
+			"iconIdx": 83
 		},
 		{
 			"icon": {
@@ -2091,7 +2091,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 83
+			"iconIdx": 84
 		},
 		{
 			"icon": {
@@ -2117,7 +2117,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 84
+			"iconIdx": 85
 		},
 		{
 			"icon": {
@@ -2142,7 +2142,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 85
+			"iconIdx": 86
 		},
 		{
 			"icon": {
@@ -2165,7 +2165,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 86
+			"iconIdx": 87
 		},
 		{
 			"icon": {
@@ -2189,7 +2189,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 87
+			"iconIdx": 88
 		},
 		{
 			"icon": {
@@ -2214,7 +2214,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 88
+			"iconIdx": 89
 		},
 		{
 			"icon": {
@@ -2238,7 +2238,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 89
+			"iconIdx": 90
 		},
 		{
 			"icon": {
@@ -2265,7 +2265,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 90
+			"iconIdx": 91
 		},
 		{
 			"icon": {
@@ -2288,7 +2288,7 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 91
+			"iconIdx": 92
 		},
 		{
 			"icon": {
@@ -2312,7 +2312,29 @@
 				"ligatures": ""
 			},
 			"setIdx": 0,
-			"iconIdx": 92
+			"iconIdx": 93
+		},
+		{
+			"icon": {
+				"paths": [
+					"M320 512c0-106.039 85.961-192 192-192 106.039 0 192 85.961 192 192 0 106.039-85.961 192-192 192-106.039 0-192-85.961-192-192z"
+				],
+				"tags": [
+					"circle-small"
+				],
+				"defaultCode": 58027,
+				"grid": 16
+			},
+			"properties": {
+				"order": 95,
+				"id": 684,
+				"prevSize": 16,
+				"code": 58027,
+				"name": "circle-small",
+				"ligatures": ""
+			},
+			"setIdx": 2,
+			"iconIdx": 683
 		}
 	],
 	"height": 1024,
