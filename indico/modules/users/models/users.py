@@ -373,7 +373,6 @@ class User(PersonMixin, db.Model):
     # - event_log_entries (EventLogEntry.user)
     # - event_notes_revisions (EventNoteRevision.user)
     # - event_persons (EventPerson.user)
-    # - event_reminders (EventReminder.creator)
     # - event_roles (EventRole.members)
     # - favorite_of (User.favorite_users)
     # - favorite_rooms (Room.favorite_of)
