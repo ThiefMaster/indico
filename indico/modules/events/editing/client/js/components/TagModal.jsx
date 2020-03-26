@@ -25,7 +25,7 @@ const availableColors = Object.keys(SUIPalette).map(colorName => ({
   value: colorName,
 }));
 
-export default function TagModal({header, onSubmit, tag, onClose}) {
+export default function TagModal({    header,   onSubmit, tag, onClose}) {
   const handleSubmit = async (formData, form) => {
     const error = await onSubmit(formData, form);
     if (error) {
