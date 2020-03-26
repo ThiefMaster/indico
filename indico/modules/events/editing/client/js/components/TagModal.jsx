@@ -34,6 +34,8 @@ export default function TagModal({header, onSubmit, tag, onClose}) {
     onClose();
   };
 
+  const stuff = 'crap';
+
   return (
     <FinalForm onSubmit={handleSubmit} subscription={{submitting: true}} initialValues={tag}>
       {fprops => (
@@ -62,7 +64,7 @@ export default function TagModal({header, onSubmit, tag, onClose}) {
           <Modal.Actions style={{display: 'flex', justifyContent: 'flex-end'}}>
             <FinalSubmitButton form="tag-form" label={Translate.string('Submit')} />
             <Button onClick={onClose} disabled={fprops.submitting}>
-              <Translate>Cancel</Translate>
+              <Translate>Cancel {stuff}</Translate>
             </Button>
           </Modal.Actions>
         </Modal>
