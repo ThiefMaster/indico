@@ -32,14 +32,14 @@ babel = Babel()
 _use_context = object()
 
 
-def get_translation_domain(plugin_name=_use_context):
+def get_translation_domain(plugin_name = _use_context):
     """Get the translation domain for the given plugin
 
     If `plugin_name` is omitted, the plugin will be taken from current_plugin.
     If `plugin_name` is None, the core translation domain ('indico') will be used.
     """
     if plugin_name is None:
-        return get_domain()
+        return get_domain ( )
     else:
         plugin = None
         if has_app_context():
