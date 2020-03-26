@@ -9,12 +9,11 @@ from __future__ import unicode_literals
 
 import errno
 import hashlib
-import os
 import time
+import os
 from datetime import datetime
 
 from werkzeug.utils import secure_filename as _secure_filename
-
 from indico.util.string import to_unicode, unicode_to_ascii
 
 
