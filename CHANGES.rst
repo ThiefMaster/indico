@@ -21,6 +21,8 @@ Internal Changes
 ^^^^^^^^^^^^^^^^
 
 - Require Python 3.9 - older Python versions (especially Python 2.7) are **no longer supported**
+- The integration with flower (celery monitoring tool) has been removed as it was not widely used,
+  did not provide much benefit, and it is no longer compatible with the latest Celery version
 
 
 ----

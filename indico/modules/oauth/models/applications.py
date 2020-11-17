@@ -24,6 +24,7 @@ SCOPES = {'read:user': _("User information (read only)"),
           'registrants': _('Event registrants')}
 
 
+# TODO: Remove flower and delete from DB in alembic task before 3.0 release
 class SystemAppType(int, IndicoEnum):
     none = 0
     checkin = 1
