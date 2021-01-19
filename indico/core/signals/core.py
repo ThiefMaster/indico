@@ -86,3 +86,7 @@ db_schema_created = _signals.signal('db-schema-created', """
 Executed when a new database schema is created.  The *sender* is the
 name of the schema.
 """)
+
+get_search_providers = _signals.signal('get-search-providers', """
+Expected to return...
+""")
