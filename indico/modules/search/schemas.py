@@ -4,6 +4,7 @@
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the MIT License; see the
 # LICENSE file for more details.
+from marshmallow import post_dump
 
 from indico.core.marshmallow import mm
 from indico.modules.categories import Category
@@ -11,34 +12,47 @@ from indico.modules.events import Event
 from indico.web.flask.util import url_for
 
 
-def _get_category_path(chain):
-    chain = chain[1:-1]  # strip root/self
-    return [
-        dict(c, url=url_for('categories.display', category_id=c['id']))
-        for c in chain
-    ]
-
-
 class CategorySchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Category
+        fields = ('id', 'title', 'url')
+
+    url = mm.Function(lambda c: url_for('categories.display', category_id=c['id']))
+
+
+class DetailedCategorySchema(mm.SQLAlchemyAutoSchema):
+    class Meta:
         fields = ('id', 'title', 'url', 'path')
 
-    path = mm.Function(lambda cat: _get_category_path(cat.chain))
+    path = mm.List(mm.Nested(CategorySchema), attribute='chain')
+
+    @post_dump()
+    def update_path(self, c, **kwargs):
+        c['path'] = c['path'][:-1]
+        return c
+
+
+class PersonSchema(mm.Schema):
+    id = mm.Int()
+    name = mm.Function(lambda e: f'{e.title} {e.name}')
+    affiliation = mm.String()
+
+
+class LocationSchema(mm.Schema):
+    venue_name = mm.String()
+    room_name = mm.String()
+    address = mm.String()
 
 
 class EventSchema(mm.SQLAlchemyAutoSchema):
     class Meta:
         model = Event
-        fields = ('id', 'title', 'url', 'type', 'start_dt', 'end_dt', 'category_path', 'speakers')
+        fields = ('id', 'title', 'description', 'url', 'type', 'keywords', 'category_path', 'chair_persons',
+                  'location', 'creation_dt', 'start_dt', 'end_dt')
 
-    category_path = mm.Function(lambda event: _get_category_path(event.detailed_category_chain))
-
-
-class PersonSchema(mm.Schema):
-    id = mm.Int()
-    title = mm.String()
-    name = mm.String()
+    location = mm.Function(lambda event: LocationSchema().dump(event))
+    chair_persons = mm.List(mm.Nested(PersonSchema), attribute='person_links')
+    category_path = mm.List(mm.Nested(CategorySchema), attribute='detailed_category_chain')
 
 
 class BaseSchema(mm.Schema):
@@ -68,7 +82,7 @@ class ResultSchema(mm.Schema):
 
 
 class CategoryResultSchema(ResultSchema):
-    results = mm.Nested(CategorySchema, required=True, many=True, attribute='items')
+    results = mm.Nested(DetailedCategorySchema, required=True, many=True, attribute='items')
 
 
 class EventResultSchema(ResultSchema):
