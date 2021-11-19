@@ -53,6 +53,7 @@ export default function ItemTypeDropdown({newItemType, inModal, onClick}) {
           value="label"
           text={staticLabel.title}
           icon={staticLabel.icon}
+          centered
           onClick={onClick}
         />
         <Dropdown.Divider style={{margin: 0}} />
@@ -83,9 +84,13 @@ ItemTypeDropdown.defaultProps = {
   newItemType: null,
 };
 
-function DropdownItem({value, text, icon, onClick}) {
+function DropdownItem({value, text, icon, centered, onClick}) {
   return (
-    <div styleName="dropdown-item" onClick={() => onClick(value)}>
+    <div
+      styleName="dropdown-item"
+      style={centered ? {textAlign: 'center'} : null}
+      onClick={() => onClick(value)}
+    >
       <i className={`icon-${icon}`} />
       <span>{text}</span>
     </div>
@@ -96,5 +101,10 @@ DropdownItem.propTypes = {
   value: PropTypes.string.isRequired,
   text: PropTypes.string.isRequired,
   icon: PropTypes.string.isRequired,
+  centered: PropTypes.bool,
   onClick: PropTypes.func.isRequired,
+};
+
+DropdownItem.defaultProps = {
+  centered: false,
 };
