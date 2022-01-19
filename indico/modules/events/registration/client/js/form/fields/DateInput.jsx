@@ -25,7 +25,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
 
   const handleDateChange = newDate => {
     const dateString = newDate ? newDate.toISOString().split('T')[0] : '';
-    const timeString = timeFormat ? timeValue : '00:00:00Z';
+    const timeString = timeFormat ? timeValue : '00:00:00';
     onChange(`${dateString}T${timeString}`);
   };
 
@@ -62,7 +62,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
             disabled={disabled}
             required={required}
             showSecond={false}
-            value={toMoment(timeValue, 'HH:mm:ssZ', true)}
+            value={toMoment(timeValue, 'HH:mm:ss', true)}
             focusOnOpen
             onChange={handleTimeChange}
             use12Hours={timeFormat === '12h'}
@@ -104,6 +104,11 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
     /%([HMdmY])/g,
     (match, c) => ({H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c])
   );
+  const validateDateTime = dateTime => {
+    if (dateTime && !dateTime.match(/\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:00(.*)/)) {
+      return Translate.string('The provided date is invalid.');
+    }
+  };
 
   if (dateFormat.includes('%d')) {
     return (
@@ -114,6 +119,7 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
         disabled={disabled}
         dateFormat={friendlyDateFormat}
         timeFormat={timeFormat}
+        validate={validateDateTime}
       />
     );
   } else {
@@ -123,12 +129,16 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
       }
       const numbers = date.replace(/[^\d]/g, '');
       if (numbers.length >= 4 && dateFormat === '%Y') {
-        return `${numbers.substr(0, 4)}-01-01T00:00:00Z`;
+        return `${numbers.substr(0, 4)}-01-01T00:00:00`;
       } else if (dateFormat !== '%Y') {
-        if (numbers.length >= 6) {
-          return `${numbers.substr(2, 4)}-${numbers.substr(0, 2)}-01T00:00:00Z`;
+        if (numbers.length >= 6 && parseInt(numbers.substr(0, 2), 10) <= 12) {
+          return `${numbers.substr(2, 4)}-${numbers.substr(0, 2)}-01T00:00:00`;
         } else if (numbers.length >= 3) {
-          return `${numbers.substr(0, 2)}${dateFormat.substr(2, 1)}${numbers.substr(2)}`;
+          return `${numbers.substr(0, 2)}${dateFormat.substr(2, 1)}${numbers.substr(2, 4)}`;
+        } else if (numbers.length === 2 && date.length > 2) {
+          return `${numbers}${dateFormat.substr(2, 1)}`;
+        } else if (numbers.length === 1 && parseInt(numbers, 10) > 1) {
+          return `0${numbers}`;
         }
       }
       return numbers;
@@ -137,7 +147,7 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
       if (!date || !date.includes('T')) {
         return date;
       }
-      return toMoment(date, 'YYYY-MM-DDTHH:mm:ssZ', true).format(friendlyDateFormat);
+      return toMoment(date, 'YYYY-MM-DDTHH:mm:ss', true).format(friendlyDateFormat);
     };
     return (
       <FinalField
@@ -149,6 +159,7 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
         placeholder={friendlyDateFormat}
         parse={parseDate}
         format={formatDate}
+        validate={validateDateTime}
       />
     );
   }
