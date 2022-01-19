@@ -10,24 +10,34 @@ import PropTypes from 'prop-types';
 import TimePicker from 'rc-time-picker';
 import React from 'react';
 import {Field} from 'react-final-form';
-import {Form} from 'semantic-ui-react';
+import {Form, Input} from 'semantic-ui-react';
 
 import {SingleDatePicker} from 'indico/react/components';
-import {FinalDropdown, FinalField, FinalInput, parsers as p} from 'indico/react/forms';
+import {FinalDropdown, FinalField, parsers as p} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
 import {toMoment} from 'indico/utils/date';
 
 import '../../../styles/regform.module.scss';
 
 function DateInputComponent({value, onChange, disabled, required, dateFormat, timeFormat}) {
-  const dateValue = value.includes(' ') ? value.split(' ')[0] : value;
-  const timeValue = value.includes(' ') ? value.split(/ (.*)/)[1] : '';
-  const timeMomentFormat = timeFormat === '12h' ? 'hh:mm a' : 'HH:mm';
-  const handleDateChange = newDate =>
+  const dateValue = value.includes('T') ? value.split('T')[0] : '';
+  const timeValue = value.includes('T') ? value.split('T')[1] : '';
+
+  const handleDateChange = newDate => {
+    const dateString = newDate ? newDate.toISOString().split('T')[0] : '';
+    const timeString = timeFormat ? timeValue : '00:00:00Z';
+    onChange(`${dateString}T${timeString}`);
+  };
+
+  const handleTimeChange = newTime =>
     onChange(
-      timeFormat ? `${newDate.format(dateFormat)} ${timeValue}` : newDate.format(dateFormat)
+      `${dateValue}T${
+        newTime
+          .set('second', 0)
+          .toISOString()
+          .split('T')[1]
+      }`
     );
-  const handleTimeChange = newTime => onChange(`${dateValue} ${newTime.format(timeMomentFormat)}`);
 
   return (
     <Form.Group styleName="date-field">
@@ -36,7 +46,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
           name="date"
           disabled={disabled}
           required={required}
-          date={toMoment(dateValue, dateFormat, true)}
+          date={toMoment(dateValue, 'YYYY-MM-DD', true)}
           onDateChange={handleDateChange}
           placeholder={dateFormat}
           displayFormat={dateFormat}
@@ -52,7 +62,7 @@ function DateInputComponent({value, onChange, disabled, required, dateFormat, ti
             disabled={disabled}
             required={required}
             showSecond={false}
-            value={toMoment(timeValue, timeMomentFormat, true)}
+            value={toMoment(timeValue, 'HH:mm:ssZ', true)}
             focusOnOpen
             onChange={handleTimeChange}
             use12Hours={timeFormat === '12h'}
@@ -107,12 +117,38 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
       />
     );
   } else {
+    const parseDate = date => {
+      if (!date) {
+        return date;
+      }
+      const numbers = date.replace(/[^\d]/g, '');
+      if (numbers.length >= 4 && dateFormat === '%Y') {
+        return `${numbers.substr(0, 4)}-01-01T00:00:00Z`;
+      } else if (dateFormat !== '%Y') {
+        if (numbers.length >= 6) {
+          return `${numbers.substr(2, 4)}-${numbers.substr(0, 2)}-01T00:00:00Z`;
+        } else if (numbers.length >= 3) {
+          return `${numbers.substr(0, 2)}${dateFormat.substr(2, 1)}${numbers.substr(2)}`;
+        }
+      }
+      return numbers;
+    };
+    const formatDate = date => {
+      if (!date || !date.includes('T')) {
+        return date;
+      }
+      return toMoment(date, 'YYYY-MM-DDTHH:mm:ssZ', true).format(friendlyDateFormat);
+    };
     return (
-      <FinalInput
+      <FinalField
         type="text"
         name={htmlName}
+        component={Input}
+        required={isRequired}
         disabled={disabled}
         placeholder={friendlyDateFormat}
+        parse={parseDate}
+        format={formatDate}
       />
     );
   }
