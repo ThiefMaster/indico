@@ -322,13 +322,9 @@ class FileField(RegistrationFormFieldBase):
 
         if file := File.query.filter(File.uuid == value, ~File.claimed).first():
             # we have a file -> always save it
-            data['file'] = {
-                'data': file.open(),
-                'name': file.filename,
-                'content_type': file.content_type
-            }
+            data['file'] = file
         else:
-            # TODO: Handle this case when we remove wtfforms from regform submission
+            # TODO: Handle this case when we remove wtforms from regform submission
             raise ValidationError(_('Invalid file UUID'))
         return data
 
