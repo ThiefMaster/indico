@@ -11,7 +11,6 @@ from operator import itemgetter
 import wtforms
 from marshmallow import ValidationError as MMValidationError
 from marshmallow import fields, pre_load, validate, validates_schema
-from werkzeug.datastructures import FileStorage
 from wtforms.validators import InputRequired, NumberRange, ValidationError
 
 from indico.core.marshmallow import mm
@@ -287,25 +286,8 @@ class CountryField(RegistrationFormFieldBase):
         return get_country(registration_data.data) if registration_data.data else ''
 
 
-class _DeletableFileField(wtforms.FileField):
-    def process_formdata(self, valuelist):
-        if not valuelist:
-            self.data = {'keep_existing': False, 'uploaded_file': None}
-        else:
-            # This expects a form with a hidden field and a file field with the same name.
-            # If the hidden field is empty, it indicates that an existing file should be
-            # deleted or replaced with the newly uploaded file.
-            keep_existing = '' not in valuelist
-            uploaded_file = next((x for x in valuelist if isinstance(x, FileStorage)), None)
-            if not uploaded_file or not uploaded_file.filename:
-                uploaded_file = None
-            self.data = {'keep_existing': keep_existing, 'uploaded_file': uploaded_file}
-
-
 class FileField(RegistrationFormFieldBase):
     name = 'file'
-    # Toggle this to make the angular form work
-    # wtf_field_class = _DeletableFileField
     wtf_field_class = wtforms.StringField
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
