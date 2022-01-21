@@ -10,6 +10,9 @@ import itertools
 from operator import attrgetter
 
 from flask import current_app, json, session
+from marshmallow import EXCLUDE
+from marshmallow import ValidationError as MMValidationError
+from marshmallow import fields, validates
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -21,6 +24,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
+from indico.core.marshmallow import IndicoSchema
 from indico.modules.events import EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
@@ -240,6 +244,35 @@ def make_registration_form(regform, management=False, registration=None):
 
     RegistrationFormWTF.modified_registration = registration
     return RegistrationFormWTF
+
+
+def make_registration_schema(regform, management=False, registration=None):
+    """Dynamically create a Marshmallow schema based on the registration form fields."""
+    class RegistrationSchema(IndicoSchema):
+        class Meta:
+            unknown = EXCLUDE
+
+        @validates('email')
+        def validate_email(self, email, **kwargs):
+            status = check_registration_email(regform, email, registration, management=management)
+            if status['status'] == 'error':
+                raise MMValidationError('Email validation failed: ' + status['conflict'])
+
+    schema = {}
+
+    if management:
+        schema['notify_user'] = fields.Boolean()
+
+    for form_item in regform.active_fields:
+        if not management and form_item.parent.is_manager_only:
+            continue
+
+        field_impl = form_item.field_impl
+        schema[form_item.html_field_name] = field_impl.create_mm_field()
+
+    # TODO: what to do with signal -> signals.event.registration_form_wtform_created
+
+    return RegistrationSchema.from_dict(schema)
 
 
 def create_personal_data_fields(regform):

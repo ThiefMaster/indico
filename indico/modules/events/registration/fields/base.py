@@ -44,6 +44,10 @@ class RegistrationFormFieldBase:
     not_required_validator = Optional
     #: the data fields that need to be versioned
     versioned_data_fields = frozenset({'price'})
+    #: the marshmallow base field for regform submission
+    mm_field_class = fields.Field
+    #: additional options for the marshmallow field
+    mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
     setup_schema_base_cls = mm.Schema
     #: a dict with extra marshmallow fields to include in the setup schema
@@ -93,6 +97,9 @@ class RegistrationFormFieldBase:
         name = f'{type(self).__name__}SetupDataSchema'
         schema = self.setup_schema_base_cls.from_dict(self.setup_schema_fields, name=name)
         return schema()
+
+    def create_mm_field(self):
+        return self.mm_field_class(required=self.form_item.is_required, **self.mm_field_kwargs)
 
     def has_data_changed(self, value, old_data):
         return value != old_data.data

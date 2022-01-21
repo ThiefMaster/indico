@@ -25,7 +25,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (check_registration_email, create_registration, generate_ticket,
                                                      get_event_regforms_registrations, get_event_section_data,
                                                      get_flat_section_submission_data, get_title_uuid,
-                                                     make_registration_form)
+                                                     make_registration_schema)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -302,16 +302,21 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
             return False
         return True
 
-    def _process(self):
-        form = make_registration_form(self.regform)()
-        if self._can_register() and form.validate_on_submit():
-            registration = create_registration(self.regform, form.data, self.invitation)
-            return redirect(url_for('.display_regform', registration.locator.registrant))
-        elif form.is_submitted():
-            # not very pretty but usually this never happens thanks to client-side validation
-            for error in form.error_list:
-                flash(error, 'error')
+    def _process_POST(self):
+        schema = make_registration_schema(self.regform)()
+        errors = schema.validate(request.json)
 
+        if self._can_register() and not errors:
+            form = schema.load(request.json)
+            registration = create_registration(self.regform, form, self.invitation)
+            return redirect(url_for('.display_regform', registration.locator.registrant))
+        else:
+            # not very pretty but usually this never happens thanks to client-side validation
+            for field in errors:
+                flash(f'{field}: {errors[field]}', 'error')
+            return self._process_GET()
+
+    def _process_GET(self):
         user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))

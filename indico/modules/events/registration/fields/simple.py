@@ -29,6 +29,7 @@ from indico.web.forms.validators import IndicoEmail
 class TextField(RegistrationFormFieldBase):
     name = 'text'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
     setup_schema_fields = {
         'min_length': fields.Integer(load_default=None, validate=validate.Range(1)),
         'max_length': fields.Integer(load_default=None, validate=validate.Range(1)),
@@ -49,6 +50,7 @@ class NumberField(RegistrationFormBillableField):
     name = 'number'
     wtf_field_class = wtforms.IntegerField
     required_validator = InputRequired
+    mm_field_class = fields.Integer
     setup_schema_base_cls = NumberFieldDataSchema
 
     @property
@@ -68,6 +70,7 @@ class NumberField(RegistrationFormBillableField):
 class TextAreaField(RegistrationFormFieldBase):
     name = 'textarea'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
     setup_schema_fields = {
         'number_of_rows': fields.Integer(load_default=None, validate=validate.Range(1, 20)),
     }
@@ -76,6 +79,7 @@ class TextAreaField(RegistrationFormFieldBase):
 class CheckboxField(RegistrationFormBillableField):
     name = 'checkbox'
     wtf_field_class = wtforms.BooleanField
+    mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
@@ -165,6 +169,7 @@ class DateFieldDataSchema(mm.Schema):
 class DateField(RegistrationFormFieldBase):
     name = 'date'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
     setup_schema_base_cls = DateFieldDataSchema
 
     @classmethod
@@ -198,6 +203,7 @@ class BooleanField(RegistrationFormBillableField):
     name = 'bool'
     wtf_field_class = IndicoRadioField
     required_validator = InputRequired
+    mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     setup_schema_fields = {
         'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),
@@ -258,11 +264,13 @@ class PhoneField(RegistrationFormFieldBase):
     name = 'phone'
     wtf_field_class = wtforms.StringField
     wtf_field_kwargs = {'filters': [lambda x: normalize_phone_number(x) if x else '']}
+    mm_field_class = fields.String
 
 
 class CountryField(RegistrationFormFieldBase):
     name = 'country'
     wtf_field_class = wtforms.SelectField
+    mm_field_class = fields.String
 
     @property
     def wtf_field_kwargs(self):
@@ -289,6 +297,7 @@ class CountryField(RegistrationFormFieldBase):
 class FileField(RegistrationFormFieldBase):
     name = 'file'
     wtf_field_class = wtforms.StringField
+    mm_field_class = fields.String
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         data = {'field_data': self.form_item.current_data}
@@ -318,6 +327,7 @@ class EmailField(RegistrationFormFieldBase):
     name = 'email'
     wtf_field_class = wtforms.StringField
     wtf_field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
+    mm_field_class = fields.Email
 
     @property
     def validators(self):
