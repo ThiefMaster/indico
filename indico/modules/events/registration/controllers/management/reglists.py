@@ -53,7 +53,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.marshmallow import Principal
 from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.args import use_kwargs
+from indico.web.args import parser, use_kwargs
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -278,20 +278,12 @@ class RHRegistrationCreate(RHManageRegFormBase):
         return user_data
 
     def _process_POST(self):
-        schema = make_registration_schema(self.regform)()
-        errors = schema.validate(request.json)
-
-        if not errors:
-            form = schema.load(request.json)
-            session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
-            create_registration(self.regform, form, management=True, notify_user=notify_user)
-            flash(_('The registration was created.'), 'success')
-            return redirect(url_for('.manage_reglist', self.regform))
-        else:
-            # not very pretty but usually this never happens thanks to client-side validation
-            for field in errors:
-                flash(f'{field}: {errors[field]}', 'error')
-            return self._process_GET()
+        schema = make_registration_schema(self.regform, management=True)()
+        form = parser.parse(schema)
+        session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
+        create_registration(self.regform, form, management=True, notify_user=notify_user)
+        flash(_('The registration was created.'), 'success')
+        return redirect(url_for('.manage_reglist', self.regform))
 
     def _process_GET(self):
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
