@@ -10,9 +10,9 @@ import React from 'react';
 import {Form as FinalForm} from 'react-final-form';
 import {useSelector} from 'react-redux';
 
-import {FinalSubmitButton} from 'indico/react/forms';
+import {FinalSubmitButton, handleSubmitError} from 'indico/react/forms';
 import {Translate} from 'indico/react/i18n';
-import {indicoAxios, handleAxiosError} from 'indico/utils/axios';
+import {indicoAxios} from 'indico/utils/axios';
 
 import FormSection from '../form/FormSection';
 
@@ -31,7 +31,7 @@ export default function RegistrationFormSubmission() {
     try {
       await indicoAxios.post(submitUrl, data);
     } catch (err) {
-      handleAxiosError(err);
+      return handleSubmitError(err);
     }
   };
 

@@ -33,6 +33,7 @@ from indico.modules.files.controllers import UploadFileMixin
 from indico.modules.users.util import send_avatar, send_default_avatar
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
+from indico.web.args import parser
 from indico.web.flask.util import send_file, url_for
 
 
@@ -304,17 +305,12 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
     def _process_POST(self):
         schema = make_registration_schema(self.regform)()
-        errors = schema.validate(request.json)
+        form = parser.parse(schema)
 
-        if self._can_register() and not errors:
-            form = schema.load(request.json)
+        if self._can_register():
             registration = create_registration(self.regform, form, self.invitation)
             return redirect(url_for('.display_regform', registration.locator.registrant))
-        else:
-            # not very pretty but usually this never happens thanks to client-side validation
-            for field in errors:
-                flash(f'{field}: {errors[field]}', 'error')
-            return self._process_GET()
+        return self._process_GET()
 
     def _process_GET(self):
         user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
