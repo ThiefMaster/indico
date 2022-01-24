@@ -127,21 +127,16 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
       if (!date) {
         return date;
       }
-      const numbers = date.replace(/[^\d]/g, '');
-      if (numbers.length >= 4 && dateFormat === '%Y') {
-        return `${numbers.substr(0, 4)}-01-01T00:00:00`;
-      } else if (dateFormat !== '%Y') {
-        if (numbers.length >= 6 && parseInt(numbers.substr(0, 2), 10) <= 12) {
-          return `${numbers.substr(2, 4)}-${numbers.substr(0, 2)}-01T00:00:00`;
-        } else if (numbers.length >= 3) {
-          return `${numbers.substr(0, 2)}${dateFormat.substr(2, 1)}${numbers.substr(2, 4)}`;
-        } else if (numbers.length === 2 && date.length > 2) {
-          return `${numbers}${dateFormat.substr(2, 1)}`;
-        } else if (numbers.length === 1 && parseInt(numbers, 10) > 1) {
-          return `0${numbers}`;
-        }
+      const regexps = {
+        '%m/%Y': /^(?<month>\d{2})\/(?<year>\d{4})$/,
+        '%m.%Y': /^(?<month>\d{2})\.(?<year>\d{4})$/,
+        '%Y': /^(?<year>\d{4})$/,
+      };
+      const match = regexps[dateFormat].exec(date);
+      if (match) {
+        return `${match.groups.year}-${match.groups.month ?? '01'}-01T00:00:00`;
       }
-      return numbers;
+      return date;
     };
     const formatDate = date => {
       if (!date || !date.includes('T')) {
