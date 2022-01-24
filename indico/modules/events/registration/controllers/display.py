@@ -315,7 +315,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
         if self._can_register():
             registration = create_registration(self.regform, form, self.invitation)
-            return redirect(url_for('.display_regform', registration.locator.registrant))
+            return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
         return self._process_GET()
 
     def _process_GET(self):

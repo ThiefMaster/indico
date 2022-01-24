@@ -29,10 +29,15 @@ export default function RegistrationFormSubmission() {
 
   const onSubmit = async data => {
     console.log(data);
+    let resp;
     try {
-      await indicoAxios.post(submitUrl, data);
+      resp = await indicoAxios.post(submitUrl, data);
     } catch (err) {
       return handleSubmitError(err);
+    }
+
+    if (resp.data.redirect) {
+      location.href = resp.data.redirect;
     }
   };
 

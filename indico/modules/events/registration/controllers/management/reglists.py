@@ -283,7 +283,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
         session['registration_notify_user_default'] = notify_user = form.pop('notify_user', False)
         create_registration(self.regform, form, management=True, notify_user=notify_user)
         flash(_('The registration was created.'), 'success')
-        return redirect(url_for('.manage_reglist', self.regform))
+        return jsonify({'redirect': url_for('.manage_reglist', self.regform)})
 
     def _process_GET(self):
         return WPManageRegistration.render_template('display/regform_display.html', self.event,
