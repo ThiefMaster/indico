@@ -16,17 +16,17 @@ import {indicoAxios} from 'indico/utils/axios';
 
 import FormSection from '../form/FormSection';
 
-import {getNestedSections, getUserInfo, getStaticData} from './selectors';
+import {getItems, getNestedSections, getUserInfo, getStaticData} from './selectors';
 
 import '../../styles/regform.module.scss';
 
 export default function RegistrationFormSubmission() {
+  const items = useSelector(getItems);
   const sections = useSelector(getNestedSections);
   const userInfo = useSelector(getUserInfo);
-  const {csrfToken, submitUrl} = useSelector(getStaticData);
+  const {submitUrl} = useSelector(getStaticData);
 
   const onSubmit = async data => {
-    data = {...data, csrf_token: csrfToken};
     console.log(data);
     try {
       await indicoAxios.post(submitUrl, data);
@@ -35,10 +35,19 @@ export default function RegistrationFormSubmission() {
     }
   };
 
+  const initialValues = Object.fromEntries(
+    Object.entries(userInfo).filter(([key]) => {
+      return Object.values(items).some(
+        ({htmlName, fieldIsPersonalData, isEnabled}) =>
+          htmlName === key && fieldIsPersonalData && isEnabled
+      );
+    })
+  );
+
   return (
     <FinalForm
       onSubmit={onSubmit}
-      initialValues={userInfo}
+      initialValues={initialValues}
       initialValuesEqual={_.isEqual}
       subscription={{}}
     >

@@ -11,7 +11,9 @@ import {createSelector} from 'reselect';
 export const isUILocked = state => state.uiLocked;
 export const getStaticData = state => state.staticData;
 const getFlatSections = state => state.sections;
-const getItems = state => state.items;
+
+/** Get a mapping from item IDs to items. */
+export const getItems = state => state.items;
 
 /** Get the currency used by the registration form. */
 export const getCurrency = createSelector(

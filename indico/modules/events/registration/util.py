@@ -10,7 +10,7 @@ import itertools
 from operator import attrgetter
 
 from flask import current_app, json, session
-from marshmallow import EXCLUDE, ValidationError, fields, validates
+from marshmallow import RAISE, ValidationError, fields, validates
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
@@ -220,7 +220,7 @@ def make_registration_schema(regform, management=False, registration=None):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
     class RegistrationSchema(IndicoSchema):
         class Meta:
-            unknown = EXCLUDE
+            unknown = RAISE
 
         @validates('email')
         def validate_email(self, email, **kwargs):
