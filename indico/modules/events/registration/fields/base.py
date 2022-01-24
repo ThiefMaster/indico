@@ -44,8 +44,8 @@ class RegistrationFormFieldBase:
     not_required_validator = Optional
     #: the data fields that need to be versioned
     versioned_data_fields = frozenset({'price'})
-    #: the marshmallow base field for regform submission
-    mm_field_class = fields.Field
+    #: the marshmallow field class for regform submission
+    mm_field_class = None
     #: additional options for the marshmallow field
     mm_field_kwargs = {}
     #: the marshmallow base schema for configuring the field
