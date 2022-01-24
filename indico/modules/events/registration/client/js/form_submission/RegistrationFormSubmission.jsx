@@ -20,11 +20,38 @@ import {getItems, getNestedSections, getUserInfo, getStaticData} from './selecto
 
 import '../../styles/regform.module.scss';
 
+function getEmailNotificationSection(position) {
+  return {
+    id: 0,
+    title: Translate.string('Email notification'),
+    description: Translate.string(
+      'Choose whether the user should be notified about the registration or not.'
+    ),
+    enabled: true,
+    isManagerOnly: true,
+    isPersonalData: false,
+    items: [
+      {
+        id: 0,
+        title: Translate.string('Send email'),
+        description: '',
+        isEnabled: true,
+        htmlName: 'notify_user',
+        inputType: 'bool',
+        defaultValue: 'no',
+        isPersonalData: false,
+        position: 1,
+      },
+    ],
+    position,
+  };
+}
+
 export default function RegistrationFormSubmission() {
   const items = useSelector(getItems);
   const sections = useSelector(getNestedSections);
   const userInfo = useSelector(getUserInfo);
-  const {submitUrl} = useSelector(getStaticData);
+  const {submitUrl, management} = useSelector(getStaticData);
 
   const onSubmit = async data => {
     console.log(data);
@@ -48,6 +75,10 @@ export default function RegistrationFormSubmission() {
       );
     })
   );
+
+  if (management) {
+    sections.push(getEmailNotificationSection(sections.length));
+  }
 
   return (
     <FinalForm
