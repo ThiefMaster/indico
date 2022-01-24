@@ -66,6 +66,10 @@ export default function RegistrationFormSubmission() {
             disabledIfInvalid={false}
             // TODO: use different label when modifying registration
             label={Translate.string('Register')}
+            style={{
+              marginTop: 15,
+              textAlign: 'center',
+            }}
           />
         </form>
       )}
