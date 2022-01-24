@@ -14,7 +14,6 @@ from uuid import uuid4
 from marshmallow import ValidationError as MMValidationError
 from marshmallow import fields, post_load, pre_load, validate, validates_schema
 from sqlalchemy.dialects.postgresql import ARRAY
-from wtforms.validators import ValidationError
 
 from indico.core.db import db
 from indico.core.marshmallow import mm
@@ -134,19 +133,18 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
-    @property
-    def validators(self):
-        def _check_number_of_places(form, field):
-            if not field.data:
-                return
+    def validators(self, registration=None, **kwargs):
+        def _check_number_of_places(new_data):
+            if not new_data:
+                return True
             old_data = None
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(field.data, old_data):
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(new_data, old_data):
                     return
             choices = self.form_item.versioned_data['choices']
             captions = self.form_item.data['captions']
-            for k in field.data:
+            for k in new_data:
                 choice = next((x for x in choices if x['id'] == k), None)
                 # Need to check the selected choice, because it might have been deleted.
                 if choice:
@@ -155,9 +153,9 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
                     places_used_dict.setdefault(k, 0)
                     if old_data and old_data.data:
                         places_used_dict[k] -= old_data.data.get(k, 0)
-                    places_used_dict[k] += field.data[k]
+                    places_used_dict[k] += new_data[k]
                     if places_limit and (places_limit - places_used_dict.get(k, 0)) < 0:
-                        raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
+                        raise MMValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
     @classmethod
@@ -501,35 +499,34 @@ class AccommodationField(RegistrationFormBillableItemsField):
         data['choices'] = items
         return data
 
-    @property
-    def validators(self):
-        def _stay_dates_valid(form, field):
-            if not field.data:
-                return
-            data = snakify_keys(field.data)
+    def validators(self, registration=None, **kwargs):
+        def _stay_dates_valid(new_data):
+            if not new_data:
+                return True
+            data = snakify_keys(new_data)
             if not data.get('is_no_accommodation'):
                 try:
                     arrival_date = data['arrival_date']
                     departure_date = data['departure_date']
                 except KeyError:
-                    raise ValidationError(_('Arrival/departure date is missing'))
+                    raise MMValidationError(_('Arrival/departure date is missing'))
                 if _to_date(arrival_date) > _to_date(departure_date):
-                    raise ValidationError(_("Arrival date can't be set after the departure date."))
+                    raise MMValidationError(_("Arrival date can't be set after the departure date."))
 
-        def _check_number_of_places(form, field):
-            if not field.data:
-                return
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(snakify_keys(field.data), old_data):
-                    return
-            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == field.data['choice']),
+        def _check_number_of_places(new_data):
+            if not new_data:
+                return True
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(snakify_keys(new_data), old_data):
+                    return True
+            item = next((x for x in self.form_item.versioned_data['choices'] if x['id'] == new_data['choice']),
                         None)
             captions = self.form_item.data['captions']
             places_used_dict = self.get_places_used()
             if (item and item['places_limit'] and
-                    (item['places_limit'] < places_used_dict.get(field.data['choice'], 0))):
-                raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
+                    (item['places_limit'] < places_used_dict.get(new_data['choice'], 0))):
+                raise MMValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 
     @property
