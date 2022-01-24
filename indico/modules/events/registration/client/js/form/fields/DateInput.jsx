@@ -133,16 +133,23 @@ export default function DateInput({htmlName, disabled, isRequired, dateFormat, t
         '%Y': /^(?<year>\d{4})$/,
       };
       const match = regexps[dateFormat].exec(date);
-      if (match) {
-        return `${match.groups.year}-${match.groups.month ?? '01'}-01T00:00:00`;
+      const rv = match ? `${match.groups.year}-${match.groups.month ?? '01'}-01T00:00:00` : date;
+      try {
+        toMoment(rv, 'YYYY-MM-DDTHH:mm:ss', true);
+        return rv;
+      } catch (e) {
+        return date;
       }
-      return date;
     };
     const formatDate = date => {
       if (!date || !date.includes('T')) {
         return date;
       }
-      return toMoment(date, 'YYYY-MM-DDTHH:mm:ss', true).format(friendlyDateFormat);
+      try {
+        return toMoment(date, 'YYYY-MM-DDTHH:mm:ss', true).format(friendlyDateFormat);
+      } catch (e) {
+        return date;
+      }
     };
     return (
       <FinalField
