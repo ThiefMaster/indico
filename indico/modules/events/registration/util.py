@@ -10,14 +10,11 @@ import itertools
 from operator import attrgetter
 
 from flask import current_app, json, session
-from marshmallow import EXCLUDE
-from marshmallow import ValidationError as MMValidationError
-from marshmallow import fields, validates
+from marshmallow import EXCLUDE, ValidationError, fields, validates
 from qrcode import QRCode, constants
 from sqlalchemy import and_, or_
 from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 from werkzeug.urls import url_parse
-from wtforms import BooleanField, ValidationError
 
 from indico.core import signals
 from indico.core.config import config
@@ -49,8 +46,6 @@ from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.spreadsheets import csv_text_io_wrapper, unique_col
 from indico.util.string import camelize_keys, validate_email, validate_email_verbose
-from indico.web.forms.base import IndicoForm
-from indico.web.forms.widgets import SwitchWidget
 
 
 def import_user_records_from_csv(fileobj, columns):
@@ -221,31 +216,6 @@ def check_registration_email(regform, email, registration=None, management=False
             return dict(status='ok', user=None)
 
 
-def make_registration_form(regform, management=False, registration=None):
-    """Create a WTForm based on registration form fields."""
-
-    class RegistrationFormWTF(IndicoForm):
-        if management:
-            notify_user = BooleanField(_('Send email'), widget=SwitchWidget())
-
-        def validate_email(self, field):
-            status = check_registration_email(regform, field.data, registration, management=management)
-            if status['status'] == 'error':
-                raise ValidationError('Email validation failed: ' + status['conflict'])
-
-    for form_item in regform.active_fields:
-        if not management and form_item.parent.is_manager_only:
-            continue
-
-        field_impl = form_item.field_impl
-        setattr(RegistrationFormWTF, form_item.html_field_name, field_impl.create_wtf_field())
-    signals.event.registration_form_wtform_created.send(regform, registration=registration, management=management,
-                                                        wtform_cls=RegistrationFormWTF)
-
-    RegistrationFormWTF.modified_registration = registration
-    return RegistrationFormWTF
-
-
 def make_registration_schema(regform, management=False, registration=None):
     """Dynamically create a Marshmallow schema based on the registration form fields."""
     class RegistrationSchema(IndicoSchema):
@@ -256,7 +226,7 @@ def make_registration_schema(regform, management=False, registration=None):
         def validate_email(self, email, **kwargs):
             status = check_registration_email(regform, email, registration, management=management)
             if status['status'] == 'error':
-                raise MMValidationError('Email validation failed: ' + status['conflict'])
+                raise ValidationError('Email validation failed: ' + status['conflict'])
 
     schema = {}
 

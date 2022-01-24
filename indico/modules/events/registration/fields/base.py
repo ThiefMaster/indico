@@ -99,7 +99,7 @@ class RegistrationFormFieldBase:
 
     def create_mm_field(self, registration=None):
         """
-        Create a a marshmallow field.
+        Create a marshmallow field.
         When modifying an existing registration, the `registration` parameter is
         the previous registration. We pass the registration because
         some field validators need the old data.
