@@ -268,7 +268,7 @@ def make_registration_schema(regform, management=False, registration=None):
             continue
 
         field_impl = form_item.field_impl
-        schema[form_item.html_field_name] = field_impl.create_mm_field()
+        schema[form_item.html_field_name] = field_impl.create_mm_field(registration=registration)
 
     # TODO: what to do with signal -> signals.event.registration_form_wtform_created
 

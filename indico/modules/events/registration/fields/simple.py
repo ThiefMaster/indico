@@ -11,7 +11,7 @@ from operator import itemgetter
 import wtforms
 from marshmallow import ValidationError as MMValidationError
 from marshmallow import fields, pre_load, validate, validates_schema
-from wtforms.validators import InputRequired, NumberRange, ValidationError
+from wtforms.validators import InputRequired, ValidationError
 
 from indico.core.marshmallow import mm
 from indico.modules.events.registration.fields.base import (BillableFieldDataSchema,
@@ -21,9 +21,8 @@ from indico.modules.files.models.files import File
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.i18n import L_, _
-from indico.util.string import normalize_phone_number
+from indico.util.string import normalize_phone_number, validate_email
 from indico.web.forms.fields import IndicoRadioField
-from indico.web.forms.validators import IndicoEmail
 
 
 class TextField(RegistrationFormFieldBase):
@@ -53,10 +52,9 @@ class NumberField(RegistrationFormBillableField):
     mm_field_class = fields.Integer
     setup_schema_base_cls = NumberFieldDataSchema
 
-    @property
-    def validators(self):
-        return [NumberRange(min=self.form_item.data.get('min_value', None) or 0,
-                            max=self.form_item.data.get('max_value', None))]
+    def validators(self, **kwargs):
+        return validate.Range(min=self.form_item.data.get('min_value', None) or 0,
+                              max=self.form_item.data.get('max_value', None))
 
     def calculate_price(self, reg_data, versioned_data):
         return versioned_data.get('price', 0) * int(reg_data or 0)
@@ -112,18 +110,17 @@ class CheckboxField(RegistrationFormBillableField):
         return {str(val).lower(): caption for val, caption in self.friendly_data_mapping.items()
                 if val is not None}
 
-    @property
-    def validators(self):
-        def _check_number_of_places(form, field):
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(field.data, old_data):
-                    return
-            if field.data and self.form_item.data.get('places_limit'):
+    def validators(self, registration=None, **kwargs):
+        def _check_number_of_places(new_data):
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(new_data, old_data):
+                    return True
+            if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
                 if not places_left:
-                    raise ValidationError(_('There are no places left for this option.'))
-        return [_check_number_of_places]
+                    raise MMValidationError(_('There are no places left for this option.'))
+        return _check_number_of_places
 
     @property
     def default_value(self):
@@ -226,18 +223,17 @@ class BooleanField(RegistrationFormBillableField):
     def view_data(self):
         return dict(super().view_data, places_used=self.get_places_used())
 
-    @property
-    def validators(self):
-        def _check_number_of_places(form, field):
-            if form.modified_registration:
-                old_data = form.modified_registration.data_by_field.get(self.form_item.id)
-                if not old_data or not self.has_data_changed(field.data, old_data):
-                    return
-            if field.data and self.form_item.data.get('places_limit'):
+    def validators(self, registration=None, **kwargs):
+        def _check_number_of_places(new_data):
+            if registration:
+                old_data = registration.data_by_field.get(self.form_item.id)
+                if not old_data or not self.has_data_changed(new_data, old_data):
+                    return True
+            if new_data and self.form_item.data.get('places_limit'):
                 places_left = self.form_item.data.get('places_limit') - self.get_places_used()
-                if field.data and not places_left:
-                    raise ValidationError(_('There are no places left for this option.'))
-        return [_check_number_of_places]
+                if new_data and not places_left:
+                    raise MMValidationError(_('There are no places left for this option.'))
+        return _check_number_of_places
 
     @property
     def default_value(self):
@@ -329,6 +325,9 @@ class EmailField(RegistrationFormFieldBase):
     wtf_field_kwargs = {'filters': [lambda x: x.lower() if x else x]}
     mm_field_class = fields.Email
 
-    @property
-    def validators(self):
-        return [IndicoEmail()]
+    def validators(self, **kwargs):
+        def _indico_email(value):
+            if value and not validate_email(value):
+                raise MMValidationError(_('Invalid email address'))
+
+        return _indico_email
