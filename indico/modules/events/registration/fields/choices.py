@@ -24,7 +24,7 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date, iterdays
 from indico.util.i18n import _
-from indico.util.marshmallow import not_empty
+from indico.util.marshmallow import UUIDString, not_empty
 from indico.util.string import camelize_keys, snakify_keys
 from indico.web.forms.fields import JSONField
 
@@ -448,11 +448,30 @@ class AccommodationSetupSchema(mm.Schema):
         return data
 
 
+class AccommodationSchema(mm.Schema):
+    choice = UUIDString()
+    isNoAccommodation = fields.Bool(required=True)
+    arrivalDate = fields.Date()
+    departureDate = fields.Date()
+
+    @validates_schema(skip_on_field_errors=True)
+    def validate_everything(self, data, **kwargs):
+        if not data['isNoAccommodation']:
+            if not data['choice']:
+                raise ValidationError('This field is required', 'choice')
+            elif not data['arrivalDate']:
+                raise ValidationError('This field is required', 'arrivalDate')
+            elif not data['departureDate']:
+                raise ValidationError('This field is required', 'departureDate')
+
+
 class AccommodationField(RegistrationFormBillableItemsField):
     name = 'accommodation'
     wtf_field_class = JSONField
     versioned_data_fields = RegistrationFormBillableField.versioned_data_fields | {'choices'}
     setup_schema_base_cls = AccommodationSetupSchema
+    mm_field_class = fields.Nested
+    mm_field_kwargs = {'nested': AccommodationSchema}
 
     @classmethod
     def process_field_data(cls, data, old_data=None, old_versioned_data=None):
@@ -510,7 +529,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
                     departure_date = data['departure_date']
                 except KeyError:
                     raise MMValidationError(_('Arrival/departure date is missing'))
-                if _to_date(arrival_date) > _to_date(departure_date):
+                if arrival_date > departure_date:
                     raise MMValidationError(_("Arrival date can't be set after the departure date."))
 
         def _check_number_of_places(new_data):
@@ -568,8 +587,8 @@ class AccommodationField(RegistrationFormBillableItemsField):
             data = {'choice': value['choice'],
                     'is_no_accommodation': is_no_accommodation}
             if not is_no_accommodation:
-                data.update({'arrival_date': value['arrivalDate'],
-                             'departure_date': value['departureDate']})
+                data.update({'arrival_date': value['arrivalDate'].isoformat(),
+                             'departure_date': value['departureDate'].isoformat()})
         return super().process_form_data(registration, data, old_data, billable_items_locked, new_data_version)
 
     def get_places_used(self):
