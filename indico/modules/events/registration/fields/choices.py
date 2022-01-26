@@ -11,8 +11,7 @@ from copy import deepcopy
 from datetime import date, datetime
 from uuid import uuid4
 
-from marshmallow import ValidationError as MMValidationError
-from marshmallow import fields, post_load, pre_load, validate, validates_schema
+from marshmallow import ValidationError, fields, post_load, pre_load, validate, validates_schema
 from sqlalchemy.dialects.postgresql import ARRAY
 
 from indico.core.db import db
@@ -107,7 +106,7 @@ class SingleChoiceSetupSchema(ChoiceSetupSchema):
     def _validate_default_item(self, data, **kwargs):
         ids = {c['id'] for c in data['choices']}
         if data['default_item'] and data['default_item'] not in ids:
-            raise MMValidationError('Invalid default item', 'default_item')
+            raise ValidationError('Invalid default item', 'default_item')
 
 
 class ChoiceBaseField(RegistrationFormBillableItemsField):
@@ -155,7 +154,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
                         places_used_dict[k] -= old_data.data.get(k, 0)
                     places_used_dict[k] += new_data[k]
                     if places_limit and (places_limit - places_used_dict.get(k, 0)) < 0:
-                        raise MMValidationError(_('No places left for the option: {0}').format(captions[k]))
+                        raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
     @classmethod
@@ -395,7 +394,7 @@ class AccommodationDateRangeSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     def _validate_dates(self, data, **kwargs):
         if data['start_date'] > data['end_date']:
-            raise MMValidationError('The end date cannot be before the start date', 'end_date')
+            raise ValidationError('The end date cannot be before the start date', 'end_date')
 
 
 class AccommodationSetupSchema(mm.Schema):
@@ -406,9 +405,9 @@ class AccommodationSetupSchema(mm.Schema):
     @validates_schema(skip_on_field_errors=True)
     def _validate_periods(self, data, **kwargs):
         if data['departure']['start_date'] < data['arrival']['start_date']:
-            raise MMValidationError('The departure period cannot begin before the arrival period.', 'departure')
+            raise ValidationError('The departure period cannot begin before the arrival period.', 'departure')
         if data['arrival']['end_date'] > data['departure']['end_date']:
-            raise MMValidationError('The arrival period cannot end after the departure period.', 'arrival')
+            raise ValidationError('The arrival period cannot end after the departure period.', 'arrival')
 
     @pre_load
     def _generate_new_uuids(self, data, **kwrags):
@@ -528,9 +527,9 @@ class AccommodationField(RegistrationFormBillableItemsField):
                     arrival_date = data['arrival_date']
                     departure_date = data['departure_date']
                 except KeyError:
-                    raise MMValidationError(_('Arrival/departure date is missing'))
+                    raise ValidationError(_('Arrival/departure date is missing'))
                 if arrival_date > departure_date:
-                    raise MMValidationError(_("Arrival date can't be set after the departure date."))
+                    raise ValidationError(_("Arrival date can't be set after the departure date."))
 
         def _check_number_of_places(new_data):
             if not new_data:
@@ -545,7 +544,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             places_used_dict = self.get_places_used()
             if (item and item['places_limit'] and
                     (item['places_limit'] < places_used_dict.get(new_data['choice'], 0))):
-                raise MMValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
+                raise ValidationError(_("Not enough rooms in '{0}'").format(captions[item['id']]))
         return [_stay_dates_valid, _check_number_of_places]
 
     @property
