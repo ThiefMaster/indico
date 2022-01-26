@@ -31,7 +31,7 @@ function BooleanInputComponent({
   const currency = useSelector(getCurrency);
   const makeOnClick = newValue => () => {
     if (value === newValue && !required) {
-      onChange('');
+      onChange(null);
     } else {
       onChange(newValue);
     }
@@ -42,23 +42,23 @@ function BooleanInputComponent({
       <Button.Group>
         <Button
           type="button"
-          active={value === 'yes'}
+          active={value === true}
           disabled={disabled || (placesLimit > 0 && placesUsed >= placesLimit)}
-          onClick={makeOnClick('yes')}
+          onClick={makeOnClick(true)}
         >
           <Translate>Yes</Translate>
         </Button>
         <Button
           type="button"
-          active={value === 'no'}
+          active={value === false}
           disabled={disabled}
-          onClick={makeOnClick('no')}
+          onClick={makeOnClick(false)}
         >
           <Translate>No</Translate>
         </Button>
       </Button.Group>
       {!!price && (
-        <Label pointing="left" styleName={`price-tag ${value !== 'yes' ? 'greyed' : ''}`}>
+        <Label pointing="left" styleName={`price-tag ${value !== true ? 'greyed' : ''}`}>
           {price.toFixed(2)} {currency}
         </Label>
       )}
@@ -72,7 +72,7 @@ function BooleanInputComponent({
 }
 
 BooleanInputComponent.propTypes = {
-  value: PropTypes.string.isRequired,
+  value: PropTypes.bool.isRequired,
   onChange: PropTypes.func.isRequired,
   disabled: PropTypes.bool.isRequired,
   required: PropTypes.bool.isRequired,
@@ -98,6 +98,7 @@ export default function BooleanInput({
       component={BooleanInputComponent}
       required={isRequired}
       disabled={disabled}
+      alowNull
       fieldProps={{className: styles.field}}
       price={price}
       placesLimit={placesLimit}
@@ -112,7 +113,7 @@ BooleanInput.propTypes = {
   disabled: PropTypes.bool,
   title: PropTypes.string.isRequired,
   isRequired: PropTypes.bool,
-  defaultValue: PropTypes.string,
+  defaultValue: PropTypes.bool,
   price: PropTypes.number,
   placesLimit: PropTypes.number,
   placesUsed: PropTypes.number,
@@ -121,7 +122,7 @@ BooleanInput.propTypes = {
 BooleanInput.defaultProps = {
   disabled: false,
   isRequired: false,
-  defaultValue: '',
+  defaultValue: null,
   price: 0,
   placesLimit: 0,
   placesUsed: 0,
@@ -129,8 +130,8 @@ BooleanInput.defaultProps = {
 
 export function BooleanSettings() {
   const options = [
-    {key: 'yes', value: 'yes', text: Translate.string('Yes')},
-    {key: 'no', value: 'no', text: Translate.string('No')},
+    {key: 'yes', value: true, text: Translate.string('Yes')},
+    {key: 'no', value: false, text: Translate.string('No')},
   ];
   return (
     <>

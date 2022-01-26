@@ -203,7 +203,7 @@ class BooleanField(RegistrationFormBillableField):
     mm_field_class = fields.Boolean
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     setup_schema_fields = {
-        'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),
+        'default_value': fields.Boolean(),
     }
     friendly_data_mapping = {None: '',
                              True: L_('Yes'),
