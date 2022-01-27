@@ -201,6 +201,7 @@ class BooleanField(RegistrationFormBillableField):
     wtf_field_class = IndicoRadioField
     required_validator = InputRequired
     mm_field_class = fields.Boolean
+    mm_field_kwargs = {'allow_none': True}
     setup_schema_base_cls = LimitedPlacesBillableFieldDataSchema
     setup_schema_fields = {
         'default_value': fields.String(load_default='', validate=validate.OneOf(['', 'yes', 'no'])),

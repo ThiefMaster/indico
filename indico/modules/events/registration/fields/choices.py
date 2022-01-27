@@ -450,8 +450,8 @@ class AccommodationSetupSchema(mm.Schema):
 class AccommodationSchema(mm.Schema):
     choice = UUIDString()
     isNoAccommodation = fields.Bool(required=True)
-    arrivalDate = fields.Date()
-    departureDate = fields.Date()
+    arrivalDate = fields.Date(allow_none=True)
+    departureDate = fields.Date(allow_none=True)
 
     @validates_schema(skip_on_field_errors=True)
     def validate_everything(self, data, **kwargs):
