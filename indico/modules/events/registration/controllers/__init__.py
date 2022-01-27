@@ -34,12 +34,12 @@ class RegistrationFormMixin:
 class RegistrationEditMixin:
     def _process_POST(self):
         schema = make_registration_schema(self.regform, management=self.management, registration=self.registration)()
-        form = parser.parse(schema)
+        form_data = parser.parse(schema)
 
-        notify_user = not self.management or form.pop('notify_user', False)
+        notify_user = not self.management or form_data.pop('notify_user', False)
         if self.management:
             session['registration_notify_user_default'] = notify_user
-        modify_registration(self.registration, form, management=self.management, notify_user=notify_user)
+        modify_registration(self.registration, form_data, management=self.management, notify_user=notify_user)
         return redirect(self.success_url)
 
     def _process_GET(self):

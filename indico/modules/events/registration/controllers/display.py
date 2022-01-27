@@ -37,6 +37,7 @@ from indico.util.i18n import _
 from indico.util.marshmallow import UUIDString
 from indico.web.args import parser, use_kwargs
 from indico.web.flask.util import send_file, url_for
+from indico.web.util import ExpectedError
 
 
 class RHRegistrationFormDisplayBase(RHDisplayEventBase):
@@ -310,13 +311,13 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         return True
 
     def _process_POST(self):
-        schema = make_registration_schema(self.regform)()
-        form = parser.parse(schema)
+        if not self._can_register():
+            raise ExpectedError(_('You cannot register for this event'))
 
-        if self._can_register():
-            registration = create_registration(self.regform, form, self.invitation)
-            return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
-        return self._process_GET()
+        schema = make_registration_schema(self.regform)()
+        form_data = parser.parse(schema)
+        registration = create_registration(self.regform, form_data, self.invitation)
+        return jsonify({'redirect': url_for('.display_regform', registration.locator.registrant)})
 
     def _process_GET(self):
         user_data = {t.name: getattr(session.user, t.name, None) if session.user else '' for t in PersonalDataType}
