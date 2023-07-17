@@ -5,5 +5,5 @@ updates:
     schedule:
       interval: monthly
       day: monday
-      time: '13:00'
+      time: '14:02'
       timezone: Europe/Zurich
