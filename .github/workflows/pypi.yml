@@ -20,6 +20,8 @@ jobs:
             requirements.dev.txt
       - name: Check version 🔍
         run: python .github/utils/check_version.py "${GITHUB_REF#refs/tags/v}"
+      - name: Extract changelog 📜
+        run: python .github/utils/extract_changelog.py "${GITHUB_REF#refs/tags/v}" /tmp/changelog.md
       - uses: actions/setup-node@v3
         name: Setup Node
         with:
@@ -39,6 +41,12 @@ jobs:
           name: indico-wheel
           retention-days: 7
           path: ./dist
+      - uses: actions/upload-artifact@v3
+        name: Store Markdown changelog 📜
+        with:
+          name: changelog
+          retention-days: 7
+          path: /tmp/changelog.md
   create-github-release:
     name: Create GitHub release 🐙
     # Upload wheel to a GitHub release. It remains available as a build artifact for a while as well.
@@ -55,6 +63,7 @@ jobs:
           --draft
           --repo ${{ github.repository }}
           --title ${{ github.ref_name }}
+          --notes-file changelog/changelog.md
           ${{ github.ref_name }}
           indico-wheel/*
         env:
