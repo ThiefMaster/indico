@@ -76,6 +76,7 @@ jobs:
     environment: publish
     runs-on: ubuntu-22.04
     permissions:
+      contents: write
       id-token: write
     steps:
       - uses: actions/download-artifact@v3
@@ -89,3 +90,11 @@ jobs:
         uses: pypa/gh-action-pypi-publish@v1.8.7
         with:
           packages-dir: indico-wheel/
+      - name: Publish GitHub release 🐙
+        run: >-
+          gh release edit
+          --draft=false
+          --repo ${{ github.repository }}
+          ${{ github.ref_name }}
+        env:
+          GH_TOKEN: ${{ github.token }}
