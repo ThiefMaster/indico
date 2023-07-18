@@ -34,6 +34,8 @@ def extract_changelog(text, version):
     END_RE = r'(^----$)|(^Version [0-9.abrc]+$)'
 
     if not (match := re.search(START_RE, text, re.MULTILINE)):
+        if version.endswith('-dev'):
+            return extract_changelog(text, version.removesuffix('-dev'))
         fail(f'Version {version} not found in text')
 
     text = text[match.end():]
