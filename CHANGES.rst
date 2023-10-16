@@ -43,6 +43,11 @@ Improvements
 - Support sessions that expire at a certain date (specified by the used flask-multipass
   provider) regardless of activity when using an external login method (:pr:`5907`, thanks
   :user:`cbartz`)
+- Make language list accessible (:issue:`5899`, :pr:`5903`, thanks :user:`foxbunny`)
+- Add the ability to use Flask sessions that don't refresh, if supported by the
+  Flask-Multipass identity provider (:pr:`5907`, thanks :user:`cbartz`)
+- Warn users with a dialog before their session expires and let them extend their sesssion
+  (thanks :user:`SegiNyn`)
 
 Bugfixes
 ^^^^^^^^
