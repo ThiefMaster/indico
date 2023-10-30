@@ -38,7 +38,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         if: steps.cache-npm.outputs.cache-hit != 'true'
         with:
           node-version: 18.x
@@ -100,7 +100,7 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -234,7 +234,7 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
@@ -290,7 +290,7 @@ jobs:
           python-version: '3.11'
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: 18.x
 
