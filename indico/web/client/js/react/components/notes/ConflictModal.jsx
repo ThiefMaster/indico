@@ -7,7 +7,7 @@
 
 import moment from 'moment/moment';
 import PropTypes from 'prop-types';
-import React, {useState} from 'react';
+import React from 'react';
 import {
   Card,
   CardContent,
@@ -29,15 +29,7 @@ import {camelizeKeys} from 'indico/utils/case';
 
 import './ConflictModal.module.scss';
 
-export function ConflictModal({
-  currentNote,
-  externalNote,
-  onClose,
-  setCloseAndReload,
-  overwriteChanges,
-}) {
-  const [open, setOpen] = useState(true);
-
+export function ConflictModal({currentNote, externalNote, onClose}) {
   // camelize the externalNoteSource keys
   const extNote = camelizeKeys(externalNote);
 
@@ -54,12 +46,8 @@ export function ConflictModal({
 
   return (
     <Modal
-      open={open}
-      onClose={() => {
-        setOpen(false);
-        onClose();
-      }}
-      onOpen={() => setOpen(true)}
+      open
+      onClose={() => onClose(null)}
       style={{minWidth: '65vw'}}
       closeOnEscape={false}
       closeOnDimmerClick={false}
@@ -157,42 +145,19 @@ export function ConflictModal({
       </Modal.Content>
       <Modal.Actions>
         <ButtonGroup styleName="action-button-icons">
-          <Button
-            icon
-            color="red"
-            onClick={async () => {
-              await overwriteChanges();
-              setOpen(false);
-              onClose();
-              setCloseAndReload(true);
-            }}
-          >
+          <Button icon color="red" onClick={() => onClose('overwrite')}>
             <Icon name="write" />
             <span styleName="action-button-text">
               <Translate>Overwrite their changes</Translate>
             </span>
           </Button>
-          <Button
-            icon
-            color="orange"
-            onClick={() => {
-              setOpen(false);
-              onClose();
-              setCloseAndReload(true);
-            }}
-          >
+          <Button icon color="orange" onClick={() => onClose('discard')}>
             <Icon name="trash alternate outline" />
             <span styleName="action-button-text">
               <Translate>Discard my changes</Translate>
             </span>
           </Button>
-          <Button
-            icon
-            onClick={() => {
-              setOpen(false);
-              onClose();
-            }}
-          >
+          <Button icon onClick={() => onClose(null)}>
             <Icon name="cancel" />
             <span styleName="action-button-text">
               <Translate>Go back to the editor</Translate>
@@ -210,6 +175,4 @@ ConflictModal.propTypes = {
   currentNote: PropTypes.string.isRequired,
   externalNote: PropTypes.object.isRequired,
   onClose: PropTypes.func.isRequired,
-  setCloseAndReload: PropTypes.func.isRequired,
-  overwriteChanges: PropTypes.func.isRequired,
 };
