@@ -100,6 +100,10 @@ export const getFieldLabelLookup = createSelector(
         label: formField.title,
         id: `input-${formField.id}`,
       });
+      lookup.set(`_${formField.htmlName}_invalidator`, {
+        label: formField.title,
+        id: `input-${formField.id}`,
+      });
     }
     // Include the "Captcha" field which isn't part of reg form registry
     lookup.set('captcha', {

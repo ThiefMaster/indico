@@ -11,7 +11,7 @@ import {Icon, Popup} from 'semantic-ui-react';
 
 import {Translate} from 'indico/react/i18n';
 
-export default function ChoiceLabel({paid, management, choice}) {
+export default function ChoiceLabel({paid, management, choice, customWarning = undefined}) {
   let modWarning = null;
   let paymentWarning = null;
   // warning about modified/removed choice
@@ -43,7 +43,7 @@ export default function ChoiceLabel({paid, management, choice}) {
   } else if (paid) {
     paymentWarning = <Translate>Choosing this option will result in a price change.</Translate>;
   }
-  if (!modWarning && !paymentWarning) {
+  if (!modWarning && !paymentWarning && !customWarning) {
     return choice.caption;
   }
   return (
@@ -56,6 +56,10 @@ export default function ChoiceLabel({paid, management, choice}) {
       {paymentWarning && (
         <Popup trigger={<Icon name="warning sign" color="orange" />}>{paymentWarning}</Popup>
       )}
+      {(modWarning || paymentWarning) && customWarning && ' '}
+      {customWarning && (
+        <Popup trigger={<Icon name="warning sign" color="red" />}>{customWarning}</Popup>
+      )}
     </>
   );
 }
@@ -63,6 +67,7 @@ export default function ChoiceLabel({paid, management, choice}) {
 ChoiceLabel.propTypes = {
   paid: PropTypes.bool.isRequired,
   management: PropTypes.bool.isRequired,
+  customWarning: PropTypes.string,
   choice: PropTypes.shape({
     caption: PropTypes.string.isRequired,
     price: PropTypes.number,

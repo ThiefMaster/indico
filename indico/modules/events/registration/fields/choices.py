@@ -75,6 +75,7 @@ class ChoiceItemSchema(LimitedPlacesBillableItemSchema):
 
 class ChoiceSetupSchema(FieldSetupSchemaBase):
     with_extra_slots = fields.Bool(load_default=False)
+    accompanying_use_slots = fields.Bool(load_default=False)
     choices = fields.List(fields.Nested(ChoiceItemSchema), required=True, validate=not_empty)
 
     @pre_load
